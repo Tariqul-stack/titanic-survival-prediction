@@ -70,3 +70,34 @@
 
 ## summary 
 - Sex and Pclass are the strongest factors: about 74% of women survived versus 19% of men, and 63% of 1st class versus 24% of 3rd class. Children and passengers with small families also survived more. Age is missing mostly for 3rd class passengers, so I will fill it using the median by Pclass and Sex.
+
+## 6. Multivariate Analysis
+
+### 6a. Sex and Pclass Together
+- Women had very high survival in 1st class (96.8%) and 2nd class (92.1%), but only 50.0% in 3rd class.
+- Men had low survival in every class: 36.9% in 1st, 15.7% in 2nd, and 13.5% in 3rd.
+- So `Sex` and `Pclass` work together: being female helps in every class, but a 3rd-class woman survived far less often than a 1st or 2nd-class woman.
+- The biggest group is 3rd-class men (347 passengers), and they had the lowest survival rate.
+
+### 6b. Embarked and Pclass
+- Passengers from C (Cherbourg) are 50.6% 1st class, while passengers from Q (Queenstown) are 93.5% 3rd class.
+- This explains part of the earlier `Embarked` effect: C looked better because it had many more 1st-class passengers.
+- Within the same class, C still has a higher rate than S: 69.4% vs 58.3% in 1st class and 37.9% vs 19.0% in 3rd class.
+- S (Southampton) 3rd-class passengers had the lowest survival rate (19.0%).
+- The Q results for 1st and 2nd class are based on only 2 and 3 passengers, so they are not reliable.
+- `Embarked` is a weaker feature than `Sex` and `Pclass`, but it may still add a little information.
+
+### 6c. Age and Fare vs Pclass
+- 1st-class passengers are older (median age 35-40) than 3rd-class passengers (median age 21.5-25).
+- Median `Fare` drops sharply with class: 60.29 in 1st, 14.25 in 2nd, and 8.05 in 3rd.
+- `Age` depends on both `Pclass` and `Sex`, so I will fill missing `Age` with the median grouped by `Pclass` and `Sex`.
+
+### 6d. Correlation Heatmap
+- `Survived` correlates most with `Sex_female` (0.54), then `Pclass` (-0.34) and `Fare` (0.26).
+- `Age` (-0.08), `SibSp` (-0.04) and `Parch` (0.08) have weak linear correlation with `Survived`.
+- Weak correlation does not mean useless: survival by age group and by family size was non-linear (children and small families did best), and correlation only measures linear relationships.
+- `Pclass` and `Fare` are fairly strongly related (-0.55), so they carry overlapping information.
+- `SibSp` and `Parch` are correlated (0.41), which supports combining them into `FamilySize`.
+
+### summary 
+- Sex and Pclass together matter most. Women in 1st and 2nd class survived more than 90% of the time, but 3rd-class women only 50%, and men survived much less in every class. Embarked looked important at first, but a big part of it is just class mix. Age and family size have weak linear correlation, but the charts show non-linear patterns, so I will engineer features from them.
