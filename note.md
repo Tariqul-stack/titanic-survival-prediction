@@ -176,3 +176,21 @@
 - `FamilySize` and `FamilyGroup` give almost the same score (difference 0.003). `IsAlone` alone gives no gain, and using all three together is no better than using one, so they are redundant.
 - Decision: keep `has_cabin` and `FamilySize`, and drop `IsAlone` and `FamilyGroup`. This is a close call, because the differences are within the noise.
 - The test set was not used for this choice.
+
+## 5. Hyperparameter Tuning
+- Final features (15): `Pclass`, `Age`, `FamilySize`, `has_cabin`, `Fare_log`, and the one-hot columns for `Sex`, `Embarked` and `Title`.
+- I tuned each model with a small grid search (5-fold CV, selected by ROC-AUC). Best settings: Logistic Regression `C=1` (same as default), Random Forest `max_depth=None` and `min_samples_leaf=3`, Gradient Boosting `learning_rate=0.1`, `max_depth=2` and `n_estimators=200`.
+- Tuning helped very little: ROC-AUC changed from 0.877 to 0.877 (Logistic Regression), 0.875 to 0.885 (Random Forest) and 0.894 to 0.896 (Gradient Boosting). Accuracy did not improve.
+- The tuned scores are slightly optimistic, because the settings were chosen on the same CV folds.
+- Gradient Boosting has the highest ROC-AUC (0.896), and its gap to Logistic Regression (0.019) is smaller than the fold-to-fold standard deviation of Logistic Regression (0.022).
+- By the rule I set before tuning, I selected **Logistic Regression**: it is simpler, its coefficients are easy to explain, and its accuracy is the same or better (0.829 vs 0.823-0.824).
+- This is a close call, because the gap is only slightly below the standard deviation. Gradient Boosting would be a reasonable choice too.
+
+## 6. Final Evaluation on the Test Set
+- The test set (179 passengers) was used once, only for the final model.
+- Logistic Regression: accuracy 0.838, precision 0.786, recall 0.797, F1 0.791, ROC-AUC 0.867.
+- Sex rule baseline: accuracy 0.777, precision 0.738, recall 0.652, F1 0.692. Always predicting "did not survive": accuracy 0.615.
+- The model beats the Sex rule by about 6 accuracy points, which is roughly 11 passengers. The biggest gain is recall for survivors (0.797 vs 0.652): the model finds more survivors than the simple rule.
+- Confusion matrix: 95 correct "did not survive", 55 correct "survived", 15 false alarms (predicted survived, but died) and 14 missed survivors.
+- The test results match cross-validation (accuracy 0.829 in CV, 0.838 on test, and ROC-AUC 0.877 vs 0.867), so there is no sign of overfitting.
+- With only 179 test passengers, the 95% bootstrap interval for accuracy is wide: 0.782 to 0.888. The estimate is therefore uncertain, and a small difference between models would not be reliable.
