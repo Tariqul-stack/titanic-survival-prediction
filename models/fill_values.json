@@ -1,0 +1,11 @@
+{
+  "age_median_by_title": {
+    "Master": 3.0,
+    "Miss": 22.0,
+    "Mr": 30.0,
+    "Mrs": 35.0,
+    "Rare": 49.0
+  },
+  "age_median_overall": 28.5,
+  "embarked_mode": "S"
+}

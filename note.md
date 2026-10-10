@@ -194,3 +194,29 @@
 - Confusion matrix: 95 correct "did not survive", 55 correct "survived", 15 false alarms (predicted survived, but died) and 14 missed survivors.
 - The test results match cross-validation (accuracy 0.829 in CV, 0.838 on test, and ROC-AUC 0.877 vs 0.867), so there is no sign of overfitting.
 - With only 179 test passengers, the 95% bootstrap interval for accuracy is wide: 0.782 to 0.888. The estimate is therefore uncertain, and a small difference between models would not be reliable.
+
+## 7. Model Interpretation
+
+### 7a. Logistic Regression Coefficients
+- Features that raise the odds of survival: `Title_Master` (coefficient 1.165, odds ratio 3.20), `Sex_female` (0.865, 2.38), `has_cabin` (0.847, 2.33), `Title_Mrs` (0.667, 1.95) and `Fare_log` (0.420, 1.52).
+- Features that lower the odds: `Title_Mr` (-1.223, 0.29), `Sex_male` (-0.799, 0.45), `FamilySize` (-0.720, 0.49), `Pclass` (-0.551, 0.58) and `Age` (-0.473, 0.62).
+- The Sex effect (female minus male coefficient) is 1.664, which means the odds of survival for a woman are about 5.3 times those of a man, holding the other features constant.
+- `Age`, `FamilySize` and `Fare_log` are standardized, so their odds ratios are per one standard deviation. For example, one standard deviation older multiplies the odds of survival by 0.62.
+- `Title_Miss` has a small negative coefficient (-0.229) only because `Sex_female` already gives women a bonus, and Miss is lower than Mrs. `Sex` and `Title` should be read together.
+- The `Embarked` coefficients are small and uncertain. `Fare_log` is positive even though `Pclass` is negative, because the two are correlated (-0.55), so single coefficients should be read with care.
+
+### 7b. Permutation Importance (test set, ROC-AUC drop)
+- Sex 0.089, Title 0.082, FamilySize 0.051, Pclass 0.026, Age 0.021, has_cabin 0.011, Fare_log 0.008, Embarked -0.003.
+- `Sex` and `Title` overlap, because `Title` already contains the sex of the passenger. So when each is shuffled alone, the other partly covers for it, and each importance is underestimated. Together they are the main driver of the predictions.
+- `FamilySize` is the third most important feature, more than `Pclass`, which is more than I expected from the EDA and the feature-set comparison.
+- `Embarked` has no effect on the test set (the drop is within the noise).
+- `has_cabin` has a large coefficient but a small permutation importance, because it overlaps with `Pclass` and `Fare`. So a large coefficient does not always mean an important feature.
+- The test set is small (179 passengers), so only the top 2-3 features are clearly separated.
+
+### 7c. Error Analysis
+- The model made 29 mistakes out of 179 passengers.
+- Accuracy is lowest for 1st-class men (0.67, 30 passengers) and 3rd-class women (0.68, 28 passengers). For the other groups it is 0.88-0.94. These are the groups where the simple Sex rule also fails.
+- Of the 10 most confident mistakes, 9 are men who survived although the model gave them a low probability (0.04-0.21), and 1 is a 2-year-old 1st-class girl who died although the model gave her 0.95.
+- So the main errors are "surprise survivors" among men, which the available features cannot explain.
+- Limitation: Logistic Regression has no interaction between `Sex` and `Pclass`, but the EDA showed that class matters differently for men and women. Interaction features or a tree-based model could capture this. This is future work, since the test set has already been used.
+- Each group has only 15-72 passengers, so the group accuracies are noisy.
