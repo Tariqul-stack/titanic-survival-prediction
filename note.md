@@ -220,3 +220,10 @@
 - So the main errors are "surprise survivors" among men, which the available features cannot explain.
 - Limitation: Logistic Regression has no interaction between `Sex` and `Pclass`, but the EDA showed that class matters differently for men and women. Interaction features or a tree-based model could capture this. This is future work, since the test set has already been used.
 - Each group has only 15-72 passengers, so the group accuracies are noisy.
+
+## 8. Consistency Check: src/ vs Notebook
+- I moved the final preprocessing and training code into `src/` (`preprocessing.py`, `train.py`, `predict.py`) and saved the trained model to `models/`.
+- To check that the scripts do the same thing as the notebooks, I ran the `src/` code on the raw test rows and compared it with the notebook results.
+- The fill values, the feature matrix, the test labels and the predicted labels are identical. The predicted probabilities differ by at most 1.3e-14, which is only floating-point rounding.
+- `src/predict.py` can predict a single passenger. Age, Cabin and Embarked are optional: a missing Age is filled with the training-set median for the passenger's title.
+- `Name` is required, because the title is extracted from it. Sex must be male or female, and Pclass must be 1, 2 or 3.
