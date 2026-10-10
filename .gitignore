@@ -3,4 +3,4 @@ cat > .gitignore << 'EOF'
 __pycache__/
 .ipynb_checkpoints/
 .DS_Store
-EOF
+EOFnote.md
