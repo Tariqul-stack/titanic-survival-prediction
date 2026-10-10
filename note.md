@@ -134,3 +134,23 @@
 - Children and small families survived more, so `Age` and family size have non-linear effects.
 - `Age` has 19.87% missing values, mostly in 3rd class. `Cabin` is 77.1% missing.
 - `Title` is a strong new feature because it combines sex and age information.
+
+## 3. Train/Test Split
+- The data was split 80/20 with `stratify=y` and `random_state=42`: 712 training rows and 179 test rows.
+- The survival rate is almost the same in both sets (38.3% in train, 38.5% in test).
+
+## 4. Missing Values
+- Missing `Age` values were filled with the median age of each `Title`, calculated from the training set only (Master 3.0, Miss 22.0, Mr 30.0, Mrs 35.0, Rare 49.0).
+- Missing `Embarked` values were filled with the training-set mode (S).
+- The same training-set values were applied to the test set, so no test information leaked into training.
+- After filling, `Age` and `Embarked` have 0 missing values in both sets.
+
+## 5. Transform and Encode
+- `Fare` was log-transformed into `Fare_log`.
+- `PassengerId`, `Name`, `Ticket`, `Cabin`, `SibSp`, `Parch` and `Fare` were dropped.
+- `Sex`, `Embarked`, `Title` and `FamilyGroup` were one-hot encoded.
+- The test set was aligned to the training columns, so both have the same 19 features and all values are numeric.
+
+## 6. Save Processed Data
+- The processed train/test sets and the fill values (`fill_values.json`) were saved to `data/processed/`.
+- The modeling notebook will load these files directly. `fill_values.json` will be used to prepare new passengers for prediction.
