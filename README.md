@@ -4,7 +4,7 @@ A machine learning project that predicts whether a Titanic passenger survived, b
 
 **Final result:** a tuned Logistic Regression model reaches **83.8% accuracy** and **0.867 ROC-AUC** on the test set (179 passengers), compared with 77.7% for the simple rule "women survive, men do not".
 
-<!-- Run on Kaggle: <link> -->
+**Run on Kaggle:** [Kaggle notebook](https://www.kaggle.com/code/tariqul1/titanic-survival-prediction/edit)
 
 ## Problem and Data
 
@@ -130,6 +130,7 @@ predict_survival({
 To reproduce the analysis, run the notebooks in order: `01_eda`, `02_preprocessing`, `03_modeling`.
 
 **Note:** `models/best_model.pkl` depends on the scikit-learn version in `requirements.txt`. If it fails to load in another environment, run `python src/train.py` to recreate it.
+**Reproducibility:** the pipeline was also run on Kaggle (Python 3.13, pandas 2.3.3, scikit-learn 1.6.1) and gave the same test results (accuracy 0.838, ROC-AUC 0.867) as the local run.
 
 ## Possible Improvements
 
