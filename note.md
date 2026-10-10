@@ -101,3 +101,36 @@
 
 ### summary 
 - Sex and Pclass together matter most. Women in 1st and 2nd class survived more than 90% of the time, but 3rd-class women only 50%, and men survived much less in every class. Embarked looked important at first, but a big part of it is just class mix. Age and family size have weak linear correlation, but the charts show non-linear patterns, so I will engineer features from them.
+
+## 7. Feature Ideas for Preprocessing
+
+### 7a. Title from Name
+- The title (Mr, Mrs, Miss, Master, etc.) can be extracted from `Name`. Rare titles (Dr, Rev, Major, Col, Lady, Sir, and others) are grouped into one `Rare` group, and Mlle/Ms/Mme are merged into Miss/Mrs.
+- Survival rate by title: Mrs 79.4%, Miss 70.3%, Master 57.5%, Rare 34.8%, Mr 15.7%.
+- `Title` carries information about both sex and age: `Master` (young boys) has a median age of 3.5, while Mr has 30.0, Mrs 35.0, and Rare 48.5.
+- Because of this, the median age by `Title` is a better way to fill missing `Age` than the median by `Pclass` and `Sex`. In particular, young boys would otherwise get an adult male age.
+- The `Rare` group has only 23 passengers, so its rate is less reliable.
+
+### 7b. Cabin Flag
+- Passengers with a known cabin survived 66.7% of the time (204 passengers), compared with 30.0% for those without one (687 passengers).
+- But `has_cabin` is strongly linked to class: 81.5% of 1st-class passengers have a cabin recorded, versus only 8.7% in 2nd class and 2.4% in 3rd class.
+- So `has_cabin` partly repeats the information in `Pclass`. It may also depend on how the records were collected.
+- I will keep it as a candidate feature and check in the modeling stage whether it improves the results.
+
+### 7c. Family Features
+- `FamilySize` = `SibSp` + `Parch` + 1, and `IsAlone` = 1 when `FamilySize` is 1.
+- Survival by family group: Alone 30.4% (537 passengers), Small family of 2-4 57.9% (292), Large family of 5+ 16.1% (62).
+- Small families did best, while both travelling alone and being in a large family were worse. This non-linear pattern is not visible in the correlation heatmap.
+- `FamilyGroup` (Alone / Small / Large) captures this pattern better than `IsAlone`. I will test both.
+
+### 7d. Fare Transform
+- Skewness of `Fare` is 4.79 before the log1p transform and 0.39 after it.
+- After the transform the distribution is much more symmetric, although there is still a peak around the cheap 3rd-class fares and a few zero fares.
+- I will use `Fare_log` for models that are sensitive to skew (such as Logistic Regression). Tree-based models do not need it.
+
+## EDA Summary
+- About 38.4% of passengers survived, so the classes are moderately imbalanced.
+- `Sex` and `Pclass` are the strongest factors, and they work together (for example, 96.8% survival for 1st-class women vs 13.5% for 3rd-class men).
+- Children and small families survived more, so `Age` and family size have non-linear effects.
+- `Age` has 19.87% missing values, mostly in 3rd class. `Cabin` is 77.1% missing.
+- `Title` is a strong new feature because it combines sex and age information.
