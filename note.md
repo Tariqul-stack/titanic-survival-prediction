@@ -154,3 +154,25 @@
 ## 6. Save Processed Data
 - The processed train/test sets and the fill values (`fill_values.json`) were saved to `data/processed/`.
 - The modeling notebook will load these files directly. `fill_values.json` will be used to prepare new passengers for prediction.
+
+## 2. Baselines
+- Always predicting "did not survive" gives 61.7% accuracy and an F1 of 0.
+- The simple rule "females survive, males do not" gives 78.9% accuracy and an F1 of 0.715. This is a strong baseline, because `Sex` alone carries a lot of information.
+
+## 3. Model Comparison (5-fold CV on the training set)
+- Cross-validated accuracy: Logistic Regression 0.827, Gradient Boosting 0.820, Random Forest 0.819.
+- The standard deviation of accuracy is about 0.023-0.029, which is larger than the differences between the models. So the three models perform about the same, and none is clearly better.
+- Gradient Boosting has the highest ROC-AUC (0.894, versus 0.878 for Logistic Regression and 0.874 for Random Forest), so it ranks passengers slightly better by survival probability.
+- All three models beat the Sex-rule baseline by only about 3-4 accuracy points. This is a small gain, and it is close to one standard deviation.
+- Conclusion: the extra features (`Title`, family features, `Pclass`, etc.) help a little, but most of the predictive power already comes from `Sex`.
+- I will not pick a model yet. First I will compare feature sets, and then tune the best candidates.
+
+## 4. Feature Set Comparison
+- I compared 5 family-feature options, each with and without `has_cabin`, using 3 models (30 cross-validation runs).
+- Mean CV accuracy ranges only from 0.809 to 0.827, while the fold-to-fold standard deviation is about 0.025. So the ranking between feature sets is not reliable.
+- The best sets were FamilyGroup only + `has_cabin` (0.827), FamilySize only + `has_cabin` (0.824), and all three family features + `has_cabin` (0.822).
+- `has_cabin` adds about 0.006-0.014 mean accuracy for every family option, and ROC-AUC is also slightly higher. The effect is clearest for Random Forest (0.819 vs 0.798 with FamilySize) and not consistent for Gradient Boosting.
+- `has_cabin` overlaps with `Pclass` and may depend on how the records were collected, so this gain should be read with care.
+- `FamilySize` and `FamilyGroup` give almost the same score (difference 0.003). `IsAlone` alone gives no gain, and using all three together is no better than using one, so they are redundant.
+- Decision: keep `has_cabin` and `FamilySize`, and drop `IsAlone` and `FamilyGroup`. This is a close call, because the differences are within the noise.
+- The test set was not used for this choice.
